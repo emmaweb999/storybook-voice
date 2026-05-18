@@ -4,8 +4,25 @@ import { motion } from "framer-motion";
 import { Search, Play, Pause, Square, Mic, BookOpen, Sparkles, Volume2, ChevronLeft, ChevronRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+type StoryBook = {
+  id: number;
+  title: string;
+  author: string;
+  age: string;
+  category: string;
+  cover: string;
+  description: string;
+  pages: string[];
+};
 
-const books = [
+declare global {
+  interface Window {
+    SpeechRecognition?: any;
+    webkitSpeechRecognition?: any;
+  }
+}
+
+const books: StoryBook[] = [
   {
     id: 1,
     title: "The Moonlight Garden",
@@ -59,7 +76,7 @@ export default function StorybookVoiceWebsite() {
   const [page, setPage] = useState(0);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [voiceStatus, setVoiceStatus] = useState("Voice controls ready");
-  const recognitionRef = useRef(null);
+  const recognitionRef = useRef<any>(null);
 
   const filteredBooks = useMemo(() => {
     return books.filter((book) =>
@@ -104,7 +121,7 @@ export default function StorybookVoiceWebsite() {
     setPage((p) => Math.max(p - 1, 0));
   };
 
-  const chooseBook = (book) => {
+  const chooseBook = (book: StoryBook) => {
     stopReading();
     setSelectedBook(book);
     setPage(0);
@@ -123,7 +140,7 @@ export default function StorybookVoiceWebsite() {
     recognition.interimResults = false;
 
     recognition.onstart = () => setVoiceStatus("Listening... Say: read, stop, next page, or previous page");
-    recognition.onresult = (event) => {
+    recognition.onresult = (event: any) => {
       const command = event.results[0][0].transcript.toLowerCase();
       setVoiceStatus(`Heard: ${command}`);
       if (command.includes("read") || command.includes("play")) readCurrentPage();
